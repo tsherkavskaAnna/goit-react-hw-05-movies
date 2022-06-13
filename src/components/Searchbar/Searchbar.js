@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import s from './Searchbar.module.css';
 import { BsSearch } from 'react-icons/bs';
 
-class Searchbar extends React.Component {
+class Searchbar extends Component {
   state = {
     searchQuery: ``,
   };
