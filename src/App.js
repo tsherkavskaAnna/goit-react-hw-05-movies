@@ -1,64 +1,72 @@
 import React, { Component } from 'react';
-import * as pixabayApi from './service/pixabay-api';
-import axios from 'axios';
-import Searchbar from 'components/Searchbar/Searchbar';
 
-class FinderApp extends Component {
+import * as pixabayApi from './service/pixabay-api';
+import Searchbar from 'components/Searchbar/Searchbar';
+import ImagesGallery from 'components/ImageGallery/ImagaeGallery';
+import Button from 'components/Button/Button';
+
+class App extends Component {
   state = {
     images: [],
     query: ``,
     page: 1,
+    showModal: false,
     isLoading: false,
     error: null,
+    largeImage: {},
+    total: 0,
   };
 
-  async componentDidMount() {
-    this.setState({ isLoading: true });
+  componentDidMount() {
     const { query, page } = this.state;
+    this.fetchPhotos(query, page);
+    document.title = `Gallery: ${query}`;
+  }
 
-    try {
-      const { query, page } = this.state;
-      const data = await pixabayApi.getImages(query, page);
-      this.setState({ images: data.hits });
-
-      document.title = `FinderApp - ${query}`;
-    } catch (error) {
-      this.setState({ error });
-    } finally {
-      this.setState({ isLoading: false });
+  componentDidUpdate(_, prevState) {
+    const { query, page } = this.state;
+    if (
+      prevState.page !== this.state.page ||
+      prevState.query !== this.state.query
+    ) {
+      this.setState({ isLoading: true });
+      this.fetchPhotos(query, page);
     }
   }
-  // getPhotos = async (query, page) => {
-  //   const data = await pixabayApi.getImages(query, page);
-  //   if(page === 1) {
-  //     this.setState({images: data.hits});
-  //     return
-  //   }
-  //   this.setState(prevState => ({
-  //     images: [...prevState.images, ...data.hits]
-  //   }))
-  // }
+
+  fetchPhotos = async (query, page) => {
+    const data = await pixabayApi.getImages(query, page);
+
+    if (page === 1) {
+      this.setState({ images: data.hits });
+      return;
+    }
+    this.setState(prevState => ({
+      images: [...prevState.images, ...data.hits],
+    }));
+  };
+
+  handleFormSubmit = query => {
+    this.setState({ query });
+  };
+
+  onLoadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
 
   render() {
-    const { images, page, query } = this.state;
-    console.log(this.state);
+    const { images } = this.state;
+
     return (
-      // <Container>
       <div>
-        <Searchbar></Searchbar>
-        <ul>
-          {this.state.images.map(image => {
-            const { id, tags, webformatURL, largeImageURL } = image;
-            return (
-              <li>
-                <img key={id} src={webformatURL} alt={tags}></img>
-              </li>
-            );
-          })}
-        </ul>
+        <Searchbar onSubmit={this.handleFormSubmit} />
+        <ImagesGallery images={images} />
+
+        {images.length > 11 && <Button onClick={this.onLoadMore} />}
       </div>
-      // </Container>
     );
   }
 }
-export default FinderApp;
+export default App;
