@@ -1,25 +1,29 @@
 import s from './ImageGallery.module.css';
 import PropTypes from 'prop-types';
+import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 
-const ImagesGallery = ({ images, onLoadMore }) => (
+const ImagesGallery = ({ images, onOpenModal }) => (
   <ul className={s.imageGallery}>
-    {images.map(({ id, webformatURL, tags }) => (
-      <li className={s.imageItem} key={id}>
-        <img
-          className={s.gallery}
-          src={webformatURL}
-          alt={tags}
-          onClick={onLoadMore}
-        />
-      </li>
+    {images.map(({ id, webformatURL, largeImageURL, tags }) => (
+      <ImageGalleryItem
+        key={id}
+        webImage={webformatURL}
+        discription={tags}
+        onOpenModal={() => onOpenModal(largeImageURL)}
+      />
     ))}
   </ul>
 );
 
 ImagesGallery.protoType = {
-  src: PropTypes.string.isRequired,
-  alt: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
+  images: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      webformatURL: PropTypes.string.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+    })
+  ),
+  onOpenModal: PropTypes.func.isRequired,
 };
 
 export default ImagesGallery;

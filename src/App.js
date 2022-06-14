@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-
 import * as pixabayApi from './service/pixabay-api';
+import { toast } from 'react-toastify';
 import Searchbar from 'components/Searchbar/Searchbar';
 import ImagesGallery from 'components/ImageGallery/ImagaeGallery';
 import Button from 'components/Button/Button';
+import Loader from 'components/Loader/Loader';
+import Modal from 'components/Modal/Modal';
 
 class App extends Component {
   state = {
@@ -13,7 +15,7 @@ class App extends Component {
     showModal: false,
     isLoading: false,
     error: null,
-    largeImage: {},
+    largeImage: ``,
     total: 0,
   };
 
@@ -25,17 +27,22 @@ class App extends Component {
 
   componentDidUpdate(_, prevState) {
     const { query, page } = this.state;
-    if (
-      prevState.page !== this.state.page ||
-      prevState.query !== this.state.query
-    ) {
+    const prevPage = prevState.page;
+    const prevQuery = prevState.query;
+
+    if (prevPage !== page || prevQuery === query) {
       this.setState({ isLoading: true });
-      this.fetchPhotos(query, page);
+      this.fetchPhotos(page, query);
     }
   }
 
   fetchPhotos = async (query, page) => {
     const data = await pixabayApi.getImages(query, page);
+
+    if (!data.hits.length) {
+      this.setState({ images: [] });
+      toast(`Sorry, no photos matched your criteria`);
+    }
 
     if (page === 1) {
       this.setState({ images: data.hits });
@@ -56,15 +63,40 @@ class App extends Component {
     }));
   };
 
+  onOpenModal = () => {
+    this.setState(prevState => ({
+      showModal: !prevState.showModal,
+    }));
+  };
+
+  openLargeImage = imageXXL => {
+    this.onOpenModal();
+    this.setState({
+      largeImage: imageXXL,
+    });
+  };
   render() {
-    const { images } = this.state;
+    const { images, query, showModal, isLoading, total, largeImage } =
+      this.state;
 
     return (
       <div>
         <Searchbar onSubmit={this.handleFormSubmit} />
-        <ImagesGallery images={images} />
-
-        {images.length > 11 && <Button onClick={this.onLoadMore} />}
+        <Loader />
+        {total && (
+          <ImagesGallery images={images} onOpenModal={this.openLargeImage} />
+        )}
+        {showModal && (
+          <Modal
+            largeImageURL={largeImage}
+            onClose={this.onOpenModal}
+            desription={query}
+          />
+        )}
+        {isLoading && <Loader />}
+        {images.length > 11 && images.length !== total && !isLoading && (
+          <Button onClick={this.onLoadMore} />
+        )}
       </div>
     );
   }
