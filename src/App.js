@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import * as pixabayApi from './service/pixabay-api';
-import { toast } from 'react-toastify';
 import Searchbar from 'components/Searchbar/Searchbar';
 import ImagesGallery from 'components/ImageGallery/ImagaeGallery';
 import Button from 'components/Button/Button';
@@ -14,88 +14,86 @@ class App extends Component {
     page: 1,
     showModal: false,
     isLoading: false,
-    error: null,
     largeImage: ``,
+    error: null,
     total: 0,
   };
 
-  componentDidMount() {
-    const { query, page } = this.state;
-    this.fetchPhotos(query, page);
-    document.title = `Gallery: ${query}`;
-  }
-
-  componentDidUpdate(_, prevState) {
+  async componentDidUpdate(_, prevState) {
     const { query, page } = this.state;
     const prevPage = prevState.page;
     const prevQuery = prevState.query;
 
-    if (prevPage !== page || prevQuery === query) {
-      this.setState({ isLoading: true });
-      this.fetchPhotos(page, query);
+    if (prevPage < page || prevQuery !== query) {
+      this.setState({ isLoading: true, error: null });
+
+      try {
+        const images = await pixabayApi.getImages(query, page);
+        this.setState(prevState => {
+          return {
+            images: [...prevState.images, ...images.hits],
+            isLoading: false,
+          };
+        });
+        if (!images.hits.length) {
+          this.setState({ images: [] });
+          toast.error(`Sorry, no photos matched yoor criteria`);
+          return;
+        }
+      } catch (error) {
+        this.setState({
+          isLoading: false,
+          error: error.message,
+        });
+      }
     }
   }
 
-  fetchPhotos = async (query, page) => {
-    const data = await pixabayApi.getImages(query, page);
-
-    if (!data.hits.length) {
-      this.setState({ images: [] });
-      toast(`Sorry, no photos matched your criteria`);
-    }
-
-    if (page === 1) {
-      this.setState({ images: data.hits });
-      return;
-    }
-    this.setState(prevState => ({
-      images: [...prevState.images, ...data.hits],
-    }));
-  };
-
   handleFormSubmit = query => {
-    this.setState({ query });
+    this.setState({ query, page: 1, images: [] });
   };
 
   onLoadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-
-  onOpenModal = () => {
-    this.setState(prevState => ({
-      showModal: !prevState.showModal,
-    }));
-  };
-
-  openLargeImage = imageXXL => {
-    this.onOpenModal();
-    this.setState({
-      largeImage: imageXXL,
+    this.setState(({ page }) => {
+      return {
+        page: page + 1,
+      };
     });
   };
+
+  onOpenModal = image => {
+    this.setState(prevState => ({
+      showModal: !prevState.showModal,
+      largeImage: image,
+    }));
+  };
+
+  onCloseModal = () => {
+    this.setState({
+      showModal: false,
+    });
+  };
+  openLargeImage = largeImg => {
+    this.onOpenModal();
+    this.setState({
+      largeImage: largeImg,
+    });
+  };
+
   render() {
-    const { images, query, showModal, isLoading, total, largeImage } =
-      this.state;
+    const { images, showModal, isLoading, largeImage } = this.state;
 
     return (
       <div>
         <Searchbar onSubmit={this.handleFormSubmit} />
-        <Loader />
-        {total && (
-          <ImagesGallery images={images} onOpenModal={this.openLargeImage} />
-        )}
-        {showModal && (
-          <Modal
-            largeImageURL={largeImage}
-            onClose={this.onOpenModal}
-            desription={query}
-          />
-        )}
+        <ToastContainer />
         {isLoading && <Loader />}
-        {images.length > 11 && images.length !== total && !isLoading && (
-          <Button onClick={this.onLoadMore} />
+        {images.length !== 0 && (
+          <ImagesGallery images={images} onOpenModal={this.onOpenModal} />
+        )}
+        {images.length > 11 && <Button onLoadMore={this.onLoadMore}></Button>}
+        {showModal && (
+          <Modal largeImage={largeImage} onModalClick={this.onOpenModal} />
         )}
       </div>
     );
