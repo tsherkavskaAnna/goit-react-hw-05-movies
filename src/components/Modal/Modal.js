@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import s from './Modal.module.css';
 
-const Modal = ({ onCloseModal, largeImage, alt }) => {
+const Modal = ({ onCloseModal, largeImage }) => {
   useEffect(() => {
     window.addEventListener(`keydown`, handleKeyDown);
     return () => {
@@ -25,7 +25,7 @@ const Modal = ({ onCloseModal, largeImage, alt }) => {
   return (
     <div className={s.overlay} onClick={handleBackdropClick}>
       <div className={s.modal}>
-        <img src={largeImage} alt={alt} />
+        <img src={largeImage} />
       </div>
     </div>
   );
