@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import * as pixabayApi from './service/pixabay-api';
 import Searchbar from 'components/Searchbar/Searchbar';
@@ -7,96 +7,73 @@ import Button from 'components/Button/Button';
 import Loader from 'components/Loader/Loader';
 import Modal from 'components/Modal/Modal';
 
-class App extends Component {
-  state = {
-    images: [],
-    query: ``,
-    page: 1,
-    showModal: false,
-    isLoading: false,
-    largeImage: ``,
-    error: null,
-    total: 0,
-  };
+function App() {
+  const [images, setImages] = useState([]);
+  const [query, setQuery] = useState(``);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImage, setLargeImage] = useState(``);
+  const [error, setError] = useState(null);
 
-  async componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
-    const prevPage = prevState.page;
-    const prevQuery = prevState.query;
+  useEffect(() => {
+    if (!query) {
+      return;
+    }
 
-    if (prevPage < page || prevQuery !== query) {
-      this.setState({ isLoading: true, error: null });
-
+    const fetchImages = async () => {
       try {
         const images = await pixabayApi.getImages(query, page);
-        this.setState(prevState => {
-          return {
-            images: [...prevState.images, ...images.hits],
-            isLoading: false,
-          };
-        });
-        if (!images.hits.length) {
-          this.setState({ images: [] });
+        setImages(prevState => [...prevState, ...images.hits]);
+        setIsLoading(true);
+
+        if (images.length === 0) {
           toast.error(`Sorry, no photos matched yoor criteria`);
-          return;
         }
       } catch (error) {
-        this.setState({
-          isLoading: false,
-          error: error.message,
-        });
+        setError(error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-  }
+    };
 
-  handleFormSubmit = query => {
-    this.setState({ query, page: 1, images: [] });
+    fetchImages();
+  }, [query, page]);
+
+  const handleFormSubmit = query => {
+    setQuery(query);
+    setImages([]);
+    setPage(1);
+    console.log(query);
+  };
+  const onLoadMore = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  onLoadMore = () => {
-    this.setState(({ page }) => {
-      return {
-        page: page + 1,
-      };
-    });
+  const onOpenModal = largeImage => {
+    setShowModal(true);
+    setLargeImage(largeImage);
   };
 
-  onOpenModal = image => {
-    this.setState(prevState => ({
-      showModal: !prevState.showModal,
-      largeImage: image,
-    }));
+  const onCloseModal = () => {
+    setShowModal(false);
+    setLargeImage(``);
   };
 
-  onCloseModal = () => {
-    this.setState({
-      showModal: false,
-    });
-  };
-  openLargeImage = largeImg => {
-    this.onOpenModal();
-    this.setState({
-      largeImage: largeImg,
-    });
-  };
-
-  render() {
-    const { images, showModal, isLoading, largeImage } = this.state;
-
-    return (
-      <div>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        <ToastContainer />
-        {isLoading && <Loader />}
-        {images.length !== 0 && (
-          <ImagesGallery images={images} onOpenModal={this.onOpenModal} />
-        )}
-        {images.length > 11 && <Button onLoadMore={this.onLoadMore}></Button>}
-        {showModal && (
-          <Modal largeImage={largeImage} onModalClick={this.onOpenModal} />
-        )}
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Searchbar onSubmit={handleFormSubmit} />
+      <ToastContainer />
+      {isLoading && <Loader />}
+      {images.length !== 0 && (
+        <ImagesGallery images={images} onOpenModal={onOpenModal} />
+      )}
+      {images.length > 11 && <Button onLoadMore={onLoadMore}></Button>}
+      {showModal && (
+        <Modal largeImage={largeImage} onCloseModal={onCloseModal} />
+      )}
+    </div>
+  );
 }
+
 export default App;
