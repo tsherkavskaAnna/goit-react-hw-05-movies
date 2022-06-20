@@ -14,7 +14,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [largeImage, setLargeImage] = useState(``);
-  //const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!query) {
@@ -25,13 +24,14 @@ function App() {
       try {
         const images = await pixabayApi.getImages(query, page);
         setImages(prevState => [...prevState, ...images.hits]);
-        console.log(images);
         setIsLoading(false);
 
         if (images.length === 0) {
           toast.error(`Sorry, no photos matched yoor criteria`);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     fetchImages();
