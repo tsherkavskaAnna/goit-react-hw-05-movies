@@ -34,7 +34,7 @@ const Modal = ({ onCloseModal, largeImage }) => {
 Modal.propTypes = {
   largeImage: PropTypes.string.isRequired,
   alt: PropTypes.string.isRequired,
-  onModalClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 export default Modal;
