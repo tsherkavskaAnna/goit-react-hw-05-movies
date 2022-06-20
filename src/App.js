@@ -19,7 +19,6 @@ function App() {
     if (!query) {
       return;
     }
-    setIsLoading(false);
     const fetchImages = async () => {
       try {
         const images = await pixabayApi.getImages(query, page);
@@ -27,7 +26,7 @@ function App() {
         setIsLoading(false);
 
         if (images.length === 0) {
-          toast.error(`Sorry, no photos matched yoor criteria`);
+          toast.error(`Sorry, no photos matched your criteria`);
         }
       } catch (error) {
         console.log(error);
