@@ -19,17 +19,19 @@ function App() {
     if (!query) {
       return;
     }
+    setIsLoading(true);
     const fetchImages = async () => {
       try {
         const images = await pixabayApi.getImages(query, page);
         setImages(prevState => [...prevState, ...images.hits]);
-        setIsLoading(false);
 
         if (images.length === 0) {
           toast.error(`Sorry, no photos matched your criteria`);
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
