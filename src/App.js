@@ -25,6 +25,7 @@ function App() {
       try {
         const images = await pixabayApi.getImages(query, page);
         setImages(prevState => [...prevState, ...images.hits]);
+        console.log(images);
         setIsLoading(false);
 
         if (images.length === 0) {
