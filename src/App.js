@@ -14,25 +14,23 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [largeImage, setLargeImage] = useState(``);
+  //const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!query) {
       return;
     }
-
+    setIsLoading(false);
     const fetchImages = async () => {
       try {
         const images = await pixabayApi.getImages(query, page);
         setImages(prevState => [...prevState, ...images.hits]);
-        setIsLoading(true);
+        setIsLoading(false);
 
         if (images.length === 0) {
           toast.error(`Sorry, no photos matched yoor criteria`);
         }
-      } catch (error) {
-      } finally {
-        setIsLoading(false);
-      }
+      } catch (error) {}
     };
 
     fetchImages();
@@ -42,8 +40,8 @@ function App() {
     setQuery(query);
     setImages([]);
     setPage(1);
-    console.log(query);
   };
+
   const onLoadMore = () => {
     setPage(prevPage => prevPage + 1);
   };
@@ -55,7 +53,6 @@ function App() {
 
   const onCloseModal = () => {
     setShowModal(false);
-    setLargeImage(``);
   };
 
   return (
