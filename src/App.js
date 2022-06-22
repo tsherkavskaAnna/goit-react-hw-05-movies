@@ -68,8 +68,8 @@ function App() {
       {images.length !== 0 && (
         <ImagesGallery images={images} onOpenModal={onOpenModal} />
       )}
-      {images.length > 11 && totalHits > page * 12 && (
-        <Button onLoadMore={onLoadMore} />
+      {images.length >= 12 && totalHits > page * 12 && (
+        <Button onLoadMore={() => onLoadMore()} />
       )}
       {showModal && (
         <Modal largeImage={largeImage} onCloseModal={onCloseModal} />
