@@ -11,6 +11,7 @@ function App() {
   const [images, setImages] = useState([]);
   const [query, setQuery] = useState(``);
   const [page, setPage] = useState(1);
+  const [totalHits, setTotalHits] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [largeImage, setLargeImage] = useState(``);
@@ -19,11 +20,12 @@ function App() {
     if (!query) {
       return;
     }
-    setIsLoading(true);
     const fetchImages = async () => {
       try {
         const images = await pixabayApi.getImages(query, page);
         setImages(prevState => [...prevState, ...images.hits]);
+        setTotalHits(images.totalHits);
+        setIsLoading(true);
 
         if (images.length === 0) {
           toast.error(`Sorry, no photos matched your criteria`);
@@ -36,12 +38,13 @@ function App() {
     };
 
     fetchImages();
-  }, [query, page]);
+  }, [query, page, totalHits]);
 
   const handleFormSubmit = query => {
     setQuery(query);
     setImages([]);
     setPage(1);
+    setIsLoading(false);
   };
 
   const onLoadMore = () => {
@@ -65,7 +68,9 @@ function App() {
       {images.length !== 0 && (
         <ImagesGallery images={images} onOpenModal={onOpenModal} />
       )}
-      {images.length > 11 && <Button onLoadMore={onLoadMore}></Button>}
+      {images.length > 11 && totalHits > page * 12 && (
+        <Button onLoadMore={onLoadMore} />
+      )}
       {showModal && (
         <Modal largeImage={largeImage} onCloseModal={onCloseModal} />
       )}

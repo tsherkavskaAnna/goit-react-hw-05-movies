@@ -7,7 +7,7 @@ const ImageGalleryItem = ({ webImage, onOpenModal, alt }) => {
       <img
         className={s.imageItemImage}
         src={webImage}
-        alt=""
+        alt={alt}
         onClick={onOpenModal}
       />
     </li>
