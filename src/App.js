@@ -16,6 +16,8 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [largeImage, setLargeImage] = useState(``);
 
+  const perPage = 12;
+
   useEffect(() => {
     if (!query) {
       return;
@@ -69,7 +71,7 @@ function App() {
       {images.length !== 0 && (
         <ImagesGallery images={images} onOpenModal={onOpenModal} />
       )}
-      {totalHits < 12 ? null : <Button onLoadMore={onLoadMore} />}
+      {totalHits < perPage ? null : <Button onLoadMore={onLoadMore} />}
       {showModal && (
         <Modal largeImage={largeImage} onCloseModal={onCloseModal} />
       )}
