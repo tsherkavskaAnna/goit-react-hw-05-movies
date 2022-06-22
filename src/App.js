@@ -20,12 +20,13 @@ function App() {
     if (!query) {
       return;
     }
+    setIsLoading(true);
+
     const fetchImages = async () => {
       try {
         const images = await pixabayApi.getImages(query, page);
         setImages(prevState => [...prevState, ...images.hits]);
-        setTotalHits(images.totalHits);
-        setIsLoading(true);
+        setTotalHits(images.hits.length);
 
         if (images.length === 0) {
           toast.error(`Sorry, no photos matched your criteria`);
@@ -38,7 +39,7 @@ function App() {
     };
 
     fetchImages();
-  }, [query, page, totalHits]);
+  }, [query, page]);
 
   const handleFormSubmit = query => {
     setQuery(query);
@@ -68,9 +69,7 @@ function App() {
       {images.length !== 0 && (
         <ImagesGallery images={images} onOpenModal={onOpenModal} />
       )}
-      {images.length >= 12 && totalHits > page * 12 && (
-        <Button onLoadMore={() => onLoadMore()} />
-      )}
+      {totalHits < 12 ? null : <Button onLoadMore={onLoadMore} />}
       {showModal && (
         <Modal largeImage={largeImage} onCloseModal={onCloseModal} />
       )}
