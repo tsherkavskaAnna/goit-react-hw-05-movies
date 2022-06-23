@@ -4,10 +4,14 @@ import axios from 'axios';
 const API_KEY = 'ff8c1bd9b42b07cf6632c931dd788828';
 const BASE_URL = `https://api.themoviedb.org/3/`;
 
-export const getMovie = async data => {
-  const result = await axios.get(
-    `${BASE_URL}trending/all/day?api_key=${API_KEY}`
-  );
-  const { hits } = result.data;
-  return { hits };
+const movieFetch = async () => {
+  try {
+    const url = `${BASE_URL}trending/all/day?api_key=${API_KEY}&page=12`;
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.log('Oops, an error');
+  }
 };
+
+export default movieFetch;
