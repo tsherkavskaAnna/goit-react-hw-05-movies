@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/tsherkavskaanna/goit-react-hw-05-movies/static/css/main.18b58164.css",
+    "main.js": "/tsherkavskaanna/goit-react-hw-05-movies/static/js/main.869e7966.js",
+    "index.html": "/tsherkavskaanna/goit-react-hw-05-movies/index.html",
+    "main.18b58164.css.map": "/tsherkavskaanna/goit-react-hw-05-movies/static/css/main.18b58164.css.map",
+    "main.869e7966.js.map": "/tsherkavskaanna/goit-react-hw-05-movies/static/js/main.869e7966.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.18b58164.css",
+    "static/js/main.869e7966.js"
+  ]
+}
