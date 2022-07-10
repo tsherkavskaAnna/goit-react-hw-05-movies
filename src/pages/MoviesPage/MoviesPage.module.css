@@ -1,0 +1,30 @@
+.form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: #fff;
+}
+
+.input {
+  display: inline-block;
+  width: 300px;
+  height: 40px;
+  margin: 15px;
+  font: inherit;
+  font-size: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.searchButton {
+  display: inline-block;
+  width: 80px;
+  height: 40px;
+  border: 1px solid #aaa;
+  opacity: 0.6;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
