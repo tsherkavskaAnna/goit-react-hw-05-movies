@@ -5,9 +5,9 @@ import s from "./CastPage.module.css";
 
 
 export default function Cast() {
-  const [cast, setCast] = useState([]);
+  const [cast, setCast] = useState(null);
   const { movieId } = useParams();
-
+  
   useEffect(() => {
     api.getMovieCast(movieId)
     .then(setCast)
@@ -17,8 +17,9 @@ export default function Cast() {
   
   return (
     <div>
+
        <ul className={s.list}>
-      {cast.map(item => (
+      {cast && cast.map(item => (
           <li key={item.id} className={s.item}>
             <img
               className={s.image}
@@ -33,7 +34,7 @@ export default function Cast() {
             />
             <h2>{item.name}</h2>
           </li>
-        ))}
+          ))}
     </ul>
     </div>
   );

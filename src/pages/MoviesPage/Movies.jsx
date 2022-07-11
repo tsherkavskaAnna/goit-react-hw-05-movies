@@ -5,7 +5,8 @@ import MoviesList from "components/MoviesList/MoviesList";
 import Loader from "components/Loader/Loader";
 import api from "service/MovieApi";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation, Link } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 
 const MoviesPage = () => {
@@ -13,21 +14,25 @@ const MoviesPage = () => {
     const [loading, setLoading] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams({});
     const queryMovie = searchParams.get('query');
+
+    const location = useLocation()
   
     const handleSubmit = event => {
       event.preventDefault();
-      setSearchParams({ query: event.target.elements.query.value.toLowerCase() });
+      setSearchParams({ query: event.target.elements.query.value.toLowerCase().trim() });
     };
+
   
     useEffect(() => {
-      if (queryMovie) {
+      if (!queryMovie) return ;
+      {
         const onSearchMovie = async () => {
           setLoading(true);
           try {
             const searchMovie = await api.getMovieByQuery(queryMovie);
             setSearchFilms(searchMovie);
           } catch (error) {
-            console.log(error);
+            toast.error(`The film you're lookink for can't be found`);
           } finally {
             setLoading(false);
           }
@@ -46,6 +51,7 @@ const MoviesPage = () => {
           </span>
         </button>
         </form>
+        <Link to={location?.state?.from ?? '/movie'}></Link>
         {loading && <Loader />}
         {searchFilms && <MoviesList films={searchFilms} />}
       </section>

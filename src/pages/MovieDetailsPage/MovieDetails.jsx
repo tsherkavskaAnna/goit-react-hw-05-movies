@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, Outlet, useLocation } from 'react-router-dom';
+import { useParams, Link, useLocation, Outlet } from 'react-router-dom';
+import { FcUpLeft } from "react-icons/fc";
+import toast, { Toaster } from 'react-hot-toast';
 import api from 'service/MovieApi';
 import Loader from 'components/Loader/Loader';
-import { FcUpLeft } from "react-icons/fc"
 import s from "./MovieDetails.module.css";
 
 const MovieDetailsPage = () => {
@@ -18,7 +19,7 @@ const MovieDetailsPage = () => {
         const dataMovie = await api.getMovieById(movieId);
         setMovieInfo(dataMovie);
       } catch (error) {
-        console.log(error);
+        toast.error(`Page not found`)
       } finally {
         setLoading(false);
       }
@@ -63,14 +64,15 @@ const MovieDetailsPage = () => {
         <h3>Additional information</h3>
         <ul>
           <li>
-            <Link to="cast">Cast</Link>
+            <Link to="cast" state={{ from: location?.state?.from ?? '/'}}>Cast</Link>
           </li>
           <li>
-            <Link to="reviews">Reviews</Link>
+            <Link to="reviews" state={{ from: location?.state?.from ?? '/'}}>Reviews</Link>
           </li>
         </ul>
         <hr />
-        <Outlet />
+       <Outlet />
+        <Toaster />
       </div>
     </>
   );
