@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, useLocation, Outlet } from 'react-router-dom';
+import { useParams, Link, useLocation, Outlet, Navigate } from 'react-router-dom';
 import { FcUpLeft } from "react-icons/fc";
 import toast, { Toaster } from 'react-hot-toast';
 import api from 'service/MovieApi';
@@ -10,6 +10,7 @@ const MovieDetailsPage = () => {
   const { movieId } = useParams();
   const [movieInfo, setMovieInfo] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -19,7 +20,8 @@ const MovieDetailsPage = () => {
         const dataMovie = await api.getMovieById(movieId);
         setMovieInfo(dataMovie);
       } catch (error) {
-        toast.error(`Page not found`)
+        setError(error.message);
+        toast.error(`Page not found`);
       } finally {
         setLoading(false);
       }
@@ -27,9 +29,12 @@ const MovieDetailsPage = () => {
   FetchDetalisMovie();
   }, [movieId]);
 
+const backToHome = location?.state?.from ?? "/";
+
   return (
     <>
-      <Link to={location?.state?.from ?? '/'}>
+    {error && <Navigate to="/" />}
+      <Link to={backToHome}>
         <button type="button"
         className={s.buttonBack}>
           <FcUpLeft /> Go back
@@ -64,10 +69,10 @@ const MovieDetailsPage = () => {
         <h3>Additional information</h3>
         <ul>
           <li>
-            <Link to="cast" state={{ from: location?.state?.from ?? '/'}}>Cast</Link>
+            <Link to="cast" state={{ from: backToHome}}>Cast</Link>
           </li>
           <li>
-            <Link to="reviews" state={{ from: location?.state?.from ?? '/'}}>Reviews</Link>
+            <Link to="reviews" state={{ from: backToHome}}>Reviews</Link>
           </li>
         </ul>
         <hr />

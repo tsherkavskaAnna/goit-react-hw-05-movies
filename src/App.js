@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Container from 'components/Container';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import Container from 'components/Container/Container.js';
 import AppBar from 'components/AppBar/AppBar';
 import Loader from 'components/Loader/Loader.js';
 
@@ -11,7 +11,6 @@ const MovieDetailsPage = lazy(() =>
 );
 const Cast = lazy(() => import('./pages/CastPage/Cast.jsx'));
 const Reviews = lazy(() => import('./pages/Reviews/Reviews.jsx'));
-const NotFoundPage = lazy(() => import('./pages/NoPage.jsx'));
 
 const App = () => {
   return (
@@ -25,7 +24,7 @@ const App = () => {
             <Route path="cast" element={<Cast />} replace={true} />
             <Route path="reviews" element={<Reviews />} replace={true} />
           </Route>
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path="*" element={<Navigate to="/" replase />} />
           <Route />
         </Routes>
       </Suspense>
